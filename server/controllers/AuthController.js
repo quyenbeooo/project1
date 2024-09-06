@@ -33,21 +33,36 @@ class AuthController {
 
   async loginUser(req, res) {
     try {
+      // Tìm người dùng theo username
       const users = await User.findOne({ username: req.body.username });
+
+      // Kiểm tra nếu không tìm thấy người dùng
       if (!users) {
-        res.status(404).json("Wrong Username!");
+        return res.status(404).json("Wrong Username!");
       }
+
+      // Kiểm tra nếu tài khoản bị khóa
+      if (users.isLocked) {
+        return res
+          .status(403)
+          .json("Account is locked. Please contact support.");
+      }
+
+      // Kiểm tra mật khẩu
       const valiPassword = await bcrypt.compare(
         req.body.password,
         users.password
       );
       if (!valiPassword) {
-        res.status(404).json("Wrong Username!");
+        return res.status(404).json("Wrong Password!");
       }
-      if (users && valiPassword) {
-        res.status(200).json(users);
-      }
-    } catch (error) {}
+
+      // Nếu username và mật khẩu đúng, trả về thông tin người dùng
+      res.status(200).json(users);
+    } catch (error) {
+      // Bắt lỗi và trả về thông báo lỗi
+      res.status(500).json({ message: "Login failed. Please try again." });
+    }
   }
 }
 export default AuthController;

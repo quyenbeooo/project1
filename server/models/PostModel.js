@@ -6,14 +6,13 @@ const shoeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     price: {
       type: Number,
       required: true,
     },
     image: {
-      type: String,
-      required: true,
+      type: Object,
+      required: false,
     },
     brand: {
       type: String,
@@ -25,6 +24,11 @@ const shoeSchema = new mongoose.Schema(
     },
     description: {
       type: String,
+      required: true,
+    },
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category", // Đảm bảo rằng danh mục tồn tại
       required: true,
     },
   },

@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema(
       type: String, // Thêm trường imageUrl vào schema
       required: false,
     },
+    isLocked: { type: Boolean, default: false },
   },
   {
     timestamps: true,

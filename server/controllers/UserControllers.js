@@ -55,6 +55,34 @@ class UserControllers {
       });
     }
   }
+  async lockAccount(req, res) {
+    try {
+      const userId = req.params.userId;
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { isLocked: true },
+        { new: true }
+      );
+      res.status(200).json({ message: "Account locked successfully", user });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  // Mở khóa tài khoản
+  async unlockAccount(req, res) {
+    try {
+      const userId = req.params.userId;
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { isLocked: false },
+        { new: true }
+      );
+      res.status(200).json({ message: "Account unlocked successfully", user });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
 }
 
 export default UserControllers;
