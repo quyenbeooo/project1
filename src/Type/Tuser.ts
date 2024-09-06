@@ -12,5 +12,6 @@ interface User {
   phoneNumber: string;
   address: string;
   role: string;
+  isLocked: boolean; // Thêm thuộc tính này để theo dõi trạng thái khóa
 }
 export default User;

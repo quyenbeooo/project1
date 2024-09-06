@@ -1,10 +1,12 @@
 import React from "react";
 import Tshoe from "../../../Type/Tshoe";
+import { Link } from "react-router-dom";
 type Props = {
   listproduct: Tshoe[];
+  ondel: (id: number) => void;
 };
 
-const ListProduct = ({ listproduct }: Props) => {
+const ListProduct = ({ listproduct, ondel }: Props) => {
   return (
     <>
       <div
@@ -34,7 +36,7 @@ const ListProduct = ({ listproduct }: Props) => {
                   Size
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 font-medium text-white">
-                  Description
+                  Category
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 font-medium text-white">
                   Action
@@ -63,7 +65,6 @@ const ListProduct = ({ listproduct }: Props) => {
                       <td className="whitespace-nowrap px-4 py-2 text-white">
                         <img
                           src={item.image}
-                          alt={item.name}
                           className="h-16 w-16 object-cover"
                         />
                       </td>
@@ -74,19 +75,21 @@ const ListProduct = ({ listproduct }: Props) => {
                         {item.size}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-white">
-                        {item.description}
+                        {item.categoryId?.name || "No Category"}
                       </td>
                       <td
                         className="whitespace-nowrap px-4 py-2 text-white"
                         style={{ display: "flex", justifyContent: "center" }}
                       >
                         <div className="action-buttons">
-                          <button
-                            className="inline-block px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600"
-                            style={{ borderRadius: "5px", padding: "5px" }}
-                          >
-                            Edit
-                          </button>
+                          <Link to={`/admin/editproduct/${item._id}`}>
+                            <button
+                              className="inline-block px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600"
+                              style={{ borderRadius: "5px", padding: "5px" }}
+                            >
+                              Edit
+                            </button>
+                          </Link>
                           <button
                             className="inline-block px-4 py-2 text-sm font-medium text-white bg-green-500 hover:bg-green-600"
                             style={{ borderRadius: "5px", padding: "5px" }}
@@ -96,6 +99,7 @@ const ListProduct = ({ listproduct }: Props) => {
                           <button
                             className="inline-block px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600"
                             style={{ borderRadius: "5px", padding: "5px" }}
+                            onClick={() => ondel(item._id)}
                           >
                             Delete
                           </button>

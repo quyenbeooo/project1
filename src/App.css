@@ -47,3 +47,30 @@
 .scroll-container:hover {
   overflow-x: auto; /* Kích hoạt cuộn ngang khi hover vào container */
 }
+.customs_img {
+  width: 45%;
+}
+.detail-text {
+  font-weight: bold;
+}
+.placeholder-custom::placeholder {
+  color: #999; /* Màu chữ của placeholder */
+  font-size: 16px; /* Kích thước chữ của placeholder */
+  font-style: italic; /* Phong cách chữ của placeholder */
+  padding: 20px;
+}
+html {
+  overflow-x: hidden;
+}
+.cutom_Swiper .custom-swiper {
+  display: flex;
+  gap: 50px; /* Thay đổi khoảng cách giữa các slide */
+}
+
+.custom-swiper .swiper-slide {
+  width: 120px !important; /* Force each slide to be 120px wide */
+  margin-right: 25px !important; /* Ensure there's 25px space between slides */
+}
+.custom-gradient {
+  background: linear-gradient(45deg, #4ba098, transparent);
+}

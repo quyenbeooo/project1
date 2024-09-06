@@ -2,11 +2,12 @@ import React from "react";
 import instancs from "../apis";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-type Tshoe = {
-  _id: string;
-  name: string;
-  price: number;
-  image: string;
+import { Swiper, SwiperSlide } from "swiper/react";
+import { width } from "@fortawesome/free-solid-svg-icons/fa0";
+import Comment from "./Comment";
+import Tshoe from "../Type/Tshoe";
+type Props = {
+  listShoe: Tshoe[];
 };
 const ShoeDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,27 +32,81 @@ const ShoeDetail = () => {
   if (loading) {
     return <div>Loading...</div>; // Hiển thị khi đang tải dữ liệu
   }
+
   console.log(shoe);
 
   return (
     <>
       <section className="text-gray-700 body-font overflow-hidden bg-white">
         <div className="container px-5 py-24 mx-auto">
-          <div className="lg:w-4/5 mx-auto flex flex-wrap">
-            <img
-              alt="ecommerce"
-              className="lg:w-1/2 w-full object-cover object-center rounded border border-gray-200"
-              src="https://images.unsplash.com/photo-1592921870789-04563d55041c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80"
-            />
+          <div
+            className="lg:w-4/5 mx-auto flex flex-wrap"
+            style={{ justifyContent: "center" }}
+          >
+            {/* detail ảnh sản phẩm */}
+            <div className="customs_img">
+              <img
+                style={{ width: "100%", height: "445px" }}
+                alt="ecommerce"
+                className="lg:w-1/2 w-full object-cover object-center rounded border border-gray-200 "
+                src={shoe?.image}
+              />
+              {/* list ảnh chi tiết sản phẩm */}
+              <Swiper
+                spaceBetween={-25} // Khoảng cách giữa các slide
+                slidesPerView={1} // Số lượng slide được hiển thị cùng một lúc
+                onSlideChange={() => console.log("slide change")}
+                onSwiper={(swiper) => console.log(swiper)}
+                className="custom-swiper"
+                style={{ marginTop: "25px" }}
+              >
+                <SwiperSlide className="custom-slide">
+                  <img
+                    style={{ width: "120px", height: "102px" }}
+                    alt="ecommerce"
+                    className="lg:w-1/2 w-full object-cover object-center rounded border border-gray-200"
+                    src={shoe?.image}
+                  />
+                </SwiperSlide>
+                <SwiperSlide className="custom-slide">
+                  <img
+                    style={{ width: "120px", height: "102px" }}
+                    alt="ecommerce"
+                    className="lg:w-1/2 w-full object-cover object-center rounded border border-gray-200"
+                    src={shoe?.image}
+                  />
+                </SwiperSlide>
+                <SwiperSlide className="custom-slide">
+                  <img
+                    style={{ width: "120px", height: "102px" }}
+                    alt="ecommerce"
+                    className="lg:w-1/2 w-full object-cover object-center rounded border border-gray-200"
+                    src={shoe?.image}
+                  />
+                </SwiperSlide>
+                <SwiperSlide className="custom-slide">
+                  <img
+                    style={{ width: "120px", height: "102px" }}
+                    alt="ecommerce"
+                    className="lg:w-1/2 w-full object-cover object-center rounded border border-gray-200"
+                    src={shoe?.image}
+                  />
+                </SwiperSlide>
+              </Swiper>
+            </div>
+            {/* end detail ảnh sản phẩm */}
             <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
               <h2 className="text-sm title-font text-gray-500 tracking-widest">
-                BRAND NAME
+                {shoe?.brand}
               </h2>
               <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">
                 {shoe?.name}
               </h1>
               <div className="flex mb-4">
                 <span className="flex items-center">
+                  <div className="" style={{ fontWeight: "bold" }}>
+                    Đánh giá tổng:
+                  </div>
                   <svg
                     fill="currentColor"
                     stroke="currentColor"
@@ -148,14 +203,7 @@ const ShoeDetail = () => {
                   </a>
                 </span>
               </div>
-              <p className="leading-relaxed">
-                Fam locavore kickstarter distillery. Mixtape chillwave tumeric
-                sriracha taximy chia microdosing tilde DIY. XOXO fam indxgo
-                juiceramps cornhole raw denim forage brooklyn. Everyday carry +1
-                seitan poutine tumeric. Gastropub blue bottle austin listicle
-                pour-over, neutra jean shorts keytar banjo tattooed umami
-                cardigan.
-              </p>
+              <p className="leading-relaxed">{shoe?.description}</p>
               <div className="flex mt-6 items-center pb-5 border-b-2 border-gray-200 mb-5">
                 <div className="flex">
                   <span className="mr-3">Color</span>
@@ -192,8 +240,8 @@ const ShoeDetail = () => {
                 <span className="title-font font-medium text-2xl text-gray-900">
                   ${shoe?.price}
                 </span>
-                <button className="flex ml-auto text-white bg-red-500 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded">
-                  Button
+                <button className="flex ml-auto text-white bg-teal-600  border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded">
+                  Mua
                 </button>
                 <button className="rounded-full w-10 h-10 bg-gray-200 p-0 border-0 inline-flex items-center justify-center text-gray-500 ml-4">
                   <svg

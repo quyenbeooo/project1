@@ -6,5 +6,9 @@ type Tshoe = {
   brand: string;
   size: string[];
   description: string;
+  category: {
+    category: string;
+    name: string;
+  };
 };
 export default Tshoe;

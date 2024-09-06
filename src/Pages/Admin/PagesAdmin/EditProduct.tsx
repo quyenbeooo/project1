@@ -5,11 +5,15 @@ import { useForm } from "react-hook-form";
 import Tshoe from "../../../Type/Tshoe";
 import { useState } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
+import instancs from "../../../apis";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import Tcategory from "../../../Type/Tcategory";
 type Props = {
-  onAdd: (product: Tshoe) => void;
+  onEdit: (product: Tshoe) => void;
   categories: Tcategory[];
 };
 const schemaProduct = Joi.object({
@@ -18,29 +22,56 @@ const schemaProduct = Joi.object({
   size: Joi.string().required(),
   price: Joi.number().required().min(0),
   description: Joi.string().allow(null, ""),
-  image: Joi.any(),
-  category: Joi.string().required(),
+  image: Joi.any().optional(),
+  categoryId: Joi.string().required(),
 });
-const AddProduct = ({ onAdd, categories }: Props) => {
+const EditProduct = ({ onEdit, categories }: Props) => {
+  const navigate = useNavigate();
+  const { id } = useParams();
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [product, setProducts] = useState<Tshoe | null>(null);
   const [file, setFile] = useState();
+
   const toggleFormVisibility = () => {
     setIsFormVisible(!isFormVisible);
   };
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { error },
   } = useForm<Tshoe>({
     resolver: joiResolver(schemaProduct),
   });
+  useEffect(() => {
+    if (id) {
+      (async () => {
+        try {
+          const { data } = await instancs.get(`/post/${id}`);
+          setProducts(data.data);
+          console.log(data.data);
+          // Cập nhật giá trị cho các trường form
+          setValue("name", data.data.name);
+          setValue("price", data.data.price);
+          setValue("brand", data.data.brand);
+          setValue("size", data.data.size);
+          setValue("description", data.data.description);
+          setValue("image", data.data.image);
+        } catch (error) {
+          console.error("Error fetching product:", error);
+        }
+      })();
+    }
+  }, [id]);
+
   const onSubmit = async (data: Tshoe) => {
-    console.log("Selected category:", data.category);
-    if (file) {
-      const formData = new FormData();
-      formData.append("image", file);
-      try {
-        // Gửi yêu cầu tải lên hình ảnh đến server
+    try {
+      console.log("Submit data:", data); // Log dữ liệu được gửi đi
+
+      if (file) {
+        const formData = new FormData();
+        formData.append("image", file);
+
         const response = await axios.post(
           "http://localhost:3000/upload",
           formData,
@@ -50,53 +81,25 @@ const AddProduct = ({ onAdd, categories }: Props) => {
             },
           }
         );
-        console.log(response);
 
-        // Cập nhật đường dẫn ảnh để hiển thị đúng
-        const baseURL = "http://localhost:3000"; // Thay đổi baseURL theo cấu hình của bạn
+        console.log("Image upload response:", response);
+
+        const baseURL = "http://localhost:3000";
         const imagePath = `${baseURL}${response.data.filePath}`;
-
-        // Thêm đường dẫn hình ảnh vào dữ liệu sản phẩm
         data.image = imagePath;
-
-        // Gửi dữ liệu sản phẩm với đường dẫn hình ảnh đến hàm onAdd
-        const result = await axios.post("http://localhost:3000/post", {
-          ...data, // Thêm tất cả các trường vào yêu cầu
-          category: data.category, // Đảm bảo categoryId là ObjectId
-          image: imagePath, // Đảm bảo rằng hình ảnh được gửi đúng
-        });
-        console.log(result);
-        if (result) {
-          onAdd(result.data);
-          setIsFormVisible(false); // Ẩn form sau khi thêm
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error("Lỗi khi gửi yêu cầu:", error.response?.data);
-        } else {
-          console.error("Lỗi không phải do Axios:", error);
-        }
       }
-    } else {
-      // Nếu không có hình ảnh, gửi dữ liệu sản phẩm mà không có hình ảnh
-      try {
-        const result = await axios.post("http://localhost:3000/post", {
-          ...data,
-          category: data.category, // Đảm bảo categoryId là ObjectId
-        });
-        console.log(result);
 
-        if (result) {
-          onAdd(result.data);
-          setIsFormVisible(false); // Ẩn form sau khi thêm
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error("Lỗi khi gửi yêu cầu:", error.response?.data);
-        } else {
-          console.error("Lỗi không phải do Axios:", error);
-        }
+      if (id !== undefined) {
+        // Khi gọi onEdit, chắc chắn rằng dữ liệu sản phẩm mới có categoryId mới
+        onEdit({ ...data, _id: id, categoryId: data.categoryId });
+      } else {
+        onEdit(data);
       }
+
+      setIsFormVisible(false);
+      navigate("/admin/listproduct");
+    } catch (error) {
+      console.error("Lỗi khi xử lý dữ liệu:", error);
     }
   };
 
@@ -107,16 +110,6 @@ const AddProduct = ({ onAdd, categories }: Props) => {
     <>
       <div className="p-6 flex justify-center items-center relative">
         {!isFormVisible && (
-          <button
-            onClick={toggleFormVisibility}
-            className="text-white rounded hover:bg-blue-600 w-[15%] h-[170px] text-[100px]"
-            style={{ backgroundRepeat: "no-repeat", border: "dashed" }}
-          >
-            +
-          </button>
-        )}
-
-        {isFormVisible && (
           <>
             {/* Nền mờ */}
             <div
@@ -133,6 +126,7 @@ const AddProduct = ({ onAdd, categories }: Props) => {
                 <h1 className="text-center text-2xl font-bold text-indigo-600 sm:text-3xl">
                   Form Thêm Sản Phẩm
                 </h1>
+
                 <button
                   onClick={toggleFormVisibility}
                   className="absolute top-[52px] right-[380px] text-gray-500 hover:text-gray-700"
@@ -220,25 +214,6 @@ const AddProduct = ({ onAdd, categories }: Props) => {
                   </div>
 
                   <div>
-                    <label htmlFor="categoryId" className="sr-only">
-                      Danh Mục
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="categoryId"
-                        {...register("category", { required: true })}
-                        className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm text-black"
-                      >
-                        {categories.map((category) => (
-                          <option key={category._id} value={category._id}>
-                            {category.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
                     <label htmlFor="Image" className="sr-only">
                       Image
                     </label>
@@ -249,13 +224,40 @@ const AddProduct = ({ onAdd, categories }: Props) => {
                         {...register("image", { required: true })}
                         onChange={handleFile}
                       />
+                      {product?.image && (
+                        <div className="text-center">
+                          <img
+                            src={product.image}
+                            alt="Product"
+                            className="mx-auto mb-4 h-32 w-auto rounded-md object-cover"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="categoryId" className="sr-only">
+                      Danh Mục
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="categoryId"
+                        {...register("categoryId", { required: true })}
+                        className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm text-black"
+                      >
+                        {categories.map((category) => (
+                          <option key={category._id} value={category._id}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                   <button
                     type="submit"
                     className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
                   >
-                    Thêm Sản Phẩm
+                    Sửa Sản Phẩm
                   </button>
                 </form>
               </div>
@@ -267,4 +269,4 @@ const AddProduct = ({ onAdd, categories }: Props) => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;

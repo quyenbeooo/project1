@@ -23,8 +23,11 @@ const Login = () => {
         navigate("/"); // Chuyển đến trang chủ nếu không phải admin
       }
     } catch (error) {
-      console.error("Đăng nhập thất bại:", error);
-      alert("Đăng nhập thất bại");
+      console.error("Đăng nhập thất bại:", error.message);
+      alert(
+        error.response?.data?.message ||
+          "Tài Khoản của bạn đã bị khóa vui lòng liên hệ bên suport để được hỗ trợ"
+      );
     }
   };
 

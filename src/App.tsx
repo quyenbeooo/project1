@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Header from "./components/Header";
 import Banner from "./components/Banner";
@@ -16,8 +16,19 @@ import HomeAdmin from "./Pages/Admin/HomeAdmin";
 import ListUser from "./Pages/Admin/PagesAdmin/ListUser";
 import ListProduct from "./Pages/Admin/PagesAdmin/ListProduct";
 import AddProduct from "./Pages/Admin/PagesAdmin/AddProduct";
+import AddCategory from "./Pages/Admin/PagesAdmin/AddCategory";
+import CategoryList from "./Pages/Admin/PagesAdmin/CategoryList";
+import EditCategory from "./Pages/Admin/PagesAdmin/EditCategory";
 import Tshoe from "./Type/Tshoe";
 import createProduct from "./apis/Shoe";
+import Comment from "./Pages/Comment";
+import EditProduct from "./Pages/Admin/PagesAdmin/EditProduct";
+import instancs from "./apis";
+import CategoryNike from "./Pages/CategoryClient/CategoryNike";
+import createCategory from "./apis/Category";
+import Tcategory from "./Type/Tcategory";
+import { toast } from "react-toastify";
+import "./App.css";
 const LoginLayout = ({ children }) => {
   return (
     <>
@@ -30,6 +41,7 @@ const LoginLayout = ({ children }) => {
 function App() {
   const navigate = useNavigate();
   const [shoes, setShoes] = useState<Tshoe[]>([]);
+  const [category, setCategory] = useState<Tcategory[]>([]);
   const [user, setUser] = useState<[]>([]);
   useEffect(() => {
     const fetchShoes = async () => {
@@ -55,27 +67,113 @@ function App() {
     };
     fetchUser();
   }, []);
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const responses = await axios.get("http://localhost:3000/category");
+        setCategory(
+          Array.isArray(responses.data.data) ? responses.data.data : []
+        );
+      } catch (error) {
+        console.error("Error fetching shoes:", error);
+      }
+    };
+    fetchCategory();
+  }, []);
   const handleAddProduct = (newShoe: Tshoe) => {
     (async () => {
       const newProduct = await createProduct(newShoe);
       setShoes([...shoes, newProduct]);
       navigate("/admin/listproduct");
+      window.location.reload();
     })();
   };
+  const handleDeleteProduct = (id: number) => {
+    console.log(id);
 
-  // const handleSave = async (updatedUser: User) => {
-  //   try {
-  //     // Gọi API để lưu thông tin người dùng
-  //     const response = await instancs.put(
-  //       `/user/${updatedUser._id}`,
-  //       updatedUser
-  //     );
-  //     console.log("Profile updated:", response.data.user);
-  //     // Xử lý các hành động khác nếu cần
-  //   } catch (error) {
-  //     console.error("Failed to update profile:", error);
-  //   }
-  // };
+    (async () => {
+      const confirms = confirm("Bạn Chắc muốn xóa sản phẩm chứ?");
+      if (confirms) {
+        await axios.delete(`http://localhost:3000/post/${id}`);
+        setShoes(shoes.filter((item) => item._id !== id && item));
+      }
+    })();
+  };
+  const handleEditProduct = async (shoe: Tshoe) => {
+    try {
+      // Kiểm tra xem id của sản phẩm có hợp lệ không
+      if (!shoe._id) {
+        console.error("ID sản phẩm không hợp lệ");
+        return;
+      }
+
+      // Gửi yêu cầu PUT để chỉnh sửa sản phẩm
+      const { data } = await instancs.put(`/post/${shoe._id}`, shoe);
+
+      // Kiểm tra dữ liệu trả về
+      if (data && data._id) {
+        // Cập nhật danh sách sản phẩm nếu thành công
+        setShoes(shoes.map((item) => (item._id === data._id ? data : item)));
+        navigate("/admin/listproduct");
+        window.location.reload();
+      } else {
+        console.error("Dữ liệu trả về không hợp lệ:", data);
+      }
+    } catch (error) {
+      console.log("loi edit app");
+    }
+  };
+  const handleAddCategory = (NewCategory: Tcategory) => {
+    (async () => {
+      const newCategory = await createCategory(NewCategory);
+      toast.success("Thêm sản phẩm thành công!");
+      setCategory([...category, newCategory]);
+      navigate("/admin/categorylist");
+    })();
+  };
+  const handleDeleteCategory = (_id: number) => {
+    console.log(_id);
+
+    (async () => {
+      const confirms = confirm("Bạn Chắc muốn xóa danh mục chứ?");
+      if (confirms) {
+        await axios.delete(`http://localhost:3000/category/${_id}`);
+        setCategory(category.filter((item) => item._id !== _id && item));
+      }
+    })();
+  };
+  const handleEditCategory = async (categoryss: Tcategory) => {
+    console.log(categoryss);
+
+    try {
+      // Kiểm tra xem id của danh mục có hợp lệ không
+      if (!categoryss._id) {
+        console.error("ID danh mục không hợp lệ");
+        return;
+      }
+
+      // Gửi yêu cầu PUT để chỉnh sửa danh mục
+      const { data } = await instancs.put(
+        `/category/${categoryss._id}`,
+        { name: categoryss.name, slug: categoryss.slug } // Đảm bảo gửi đúng dữ liệu
+      );
+
+      // Kiểm tra dữ liệu trả về
+      if (data && data.data && data.data._id) {
+        // Cập nhật danh sách sản phẩm nếu thành công
+        setCategory(
+          category.map((item) =>
+            item._id === data.data._id ? data.data : item
+          )
+        );
+        navigate("/admin/categorylist");
+      } else {
+        console.error("Dữ liệu trả về không hợp lệ:", data);
+      }
+    } catch (error) {
+      console.error("Lỗi khi chỉnh sửa danh mục:", error);
+    }
+  };
 
   return (
     <>
@@ -87,8 +185,8 @@ function App() {
               <>
                 <Header />
                 <Banner />
-                <HomeClient listShoe={shoes} />
-                <NewCollections />
+                <NewCollections categories={category} />
+                <HomeClient listShoe={shoes} categories={category} />
                 <Footer />
               </>
             }
@@ -99,6 +197,17 @@ function App() {
               <>
                 <Header />
                 <ShoeDetail />
+                <Comment productId={String(useParams().id)} />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/nike/category/:categoryId"
+            element={
+              <>
+                <Header />
+                <CategoryNike />
                 <Footer />
               </>
             }
@@ -135,11 +244,38 @@ function App() {
             <Route path="/admin/list" element={<ListUser listUser={user} />} />
             <Route
               path="/admin/listproduct"
-              element={<ListProduct listproduct={shoes} />}
+              element={
+                <ListProduct listproduct={shoes} ondel={handleDeleteProduct} />
+              }
             />
             <Route
               path="/admin/addproduct"
-              element={<AddProduct onAdd={handleAddProduct} />}
+              element={
+                <AddProduct onAdd={handleAddProduct} categories={category} />
+              }
+            />
+            <Route
+              path="/admin/editproduct/:id"
+              element={
+                <EditProduct onEdit={handleEditProduct} categories={category} />
+              }
+            />
+            <Route
+              path="/admin/category"
+              element={<AddCategory onAddCategory={handleAddCategory} />}
+            />
+            <Route
+              path="/admin/categorylist"
+              element={
+                <CategoryList
+                  listCategory={category}
+                  onDelCategory={handleDeleteCategory}
+                />
+              }
+            />
+            <Route
+              path="/admin/editcategory/:id"
+              element={<EditCategory onEditCategory={handleEditCategory} />}
             />
           </Route>
         </Routes>

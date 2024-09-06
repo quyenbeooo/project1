@@ -1,9 +1,8 @@
 import React from "react";
-import { Link } from "react-router-dom";
 const Sidebar = () => {
   return (
     <>
-      <div className="sidebar">
+      <div className="sidebar bg-teal-600">
         <div className="sidebar_logo">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <title>view-dashboard</title>
@@ -29,8 +28,12 @@ const Sidebar = () => {
           <a href="/admin/addproduct">
             <li>Thêm Sản Phẩm</li>
           </a>
-          <li>Tasks</li>
-          <li>Communities</li>
+          <a href="/admin/category">
+            <li>Thêm Danh Mục</li>
+          </a>
+          <a href="/admin/categorylist">
+            <li>Danh Sách Danh Mục</li>
+          </a>
           <li>Settings</li>
           <li>Support</li>
           <li>Privacy</li>

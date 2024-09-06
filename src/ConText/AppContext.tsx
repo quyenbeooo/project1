@@ -41,6 +41,12 @@ export const AuthProvider = ({ children }) => {
 
       const userData = response.data;
 
+      if (userData.isLocked) {
+        throw new Error(
+          "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ bộ phận hỗ trợ."
+        );
+      }
+
       // Lưu trữ dữ liệu người dùng bao gồm cả vai trò
       setUser(userData);
       cookies.set("user", userData, { path: "/" });
