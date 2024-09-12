@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
       default: "client",
     },
     imageUrl: {
-      type: String, // Thêm trường imageUrl vào schema
+      type: String,
       required: false,
     },
     isLocked: { type: Boolean, default: false },

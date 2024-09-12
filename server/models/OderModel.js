@@ -1,47 +1,26 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  orderItems: [
-    {
-      shoe: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Shoe",
-        required: true,
-      },
-      quantity: {
-        type: Number,
-        required: true,
-      },
+const orderSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId, // Liên kết với bảng User
+      required: true,
+      ref: "User",
     },
-  ],
-  totalPrice: {
-    type: Number,
-    required: true,
+    cartItems: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId, // Liên kết với bảng (Tshoe)
+          required: true,
+          ref: "Shoe",
+        },
+        qty: { type: Number, required: true }, // Số lượng sản phẩm
+      },
+    ],
   },
-  isPaid: {
-    type: Boolean,
-    default: false,
-  },
-  paidAt: {
-    type: Date,
-  },
-  isDelivered: {
-    type: Boolean,
-    default: false,
-  },
-  deliveredAt: {
-    type: Date,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
+  {
+    timestamps: true, // Tự động tạo thời gian thêm và chỉnh sửa
+  }
+);
 const Order = mongoose.model("Order", orderSchema);
 export default Order;

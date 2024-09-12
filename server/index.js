@@ -12,6 +12,7 @@ import path from "path";
 import Shoe from "./models/PostModel.js";
 import RouterCategory from "./routers/categories.js";
 import { fileURLToPath } from "url";
+import RouterOrder from "./routers/orders.js";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,7 +55,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
   }
 });
 
-app.use(bodyParser.json());
+app.use(express.json()); // Đảm bảo middleware này để parse JSON body
 app.use(bodyParser.urlencoded({ extended: true, limit: "30mb" }));
 
 app.use("/auth", authRouter);
@@ -62,6 +63,7 @@ app.use("/post", RouterProduct);
 app.use("/user", UserRouters);
 app.use("/comments", CommentRouter);
 app.use("/category", RouterCategory);
+app.use("/order", RouterOrder);
 
 mongoose
   .connect(process.env.MONGODB_URL)

@@ -35,13 +35,14 @@ class ProductController {
 
       const { image, name, price, brand, size, description, category } =
         req.body;
-
+      console.log("Received data:", req.body);
+      console.log("Received Size:", size);
       if (
         !image ||
         !name ||
         !price ||
         !brand ||
-        !size ||
+        !Array.isArray(size) ||
         !description ||
         !category
       ) {
