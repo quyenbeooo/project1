@@ -1,37 +1,25 @@
 // Header.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../ConText/AppContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCartFlatbed } from "@fortawesome/free-solid-svg-icons";
+import Cookies from "universal-cookie";
 
 const Header: React.FC = () => {
   const { user, setUser, logout } = useAuth();
-  console.log(user);
 
+  const cookies = new Cookies();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // useEffect(() => {
-  //   const fetchUserData = async () => {
-  //     if (!user) {
-  //       try {
-  //         const response = await axios.get("http://localhost:3000/user");
-  //         setUser(response.data);
-  //         console.log(response.data);
-  //       } catch (error) {
-  //         console.error("Error fetching user data:", error);
-  //       }
-  //     }
-  //   };
-
-  //   fetchUserData();
-  // }, []);
 
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   const handleLogout = () => {
+    cookies.remove("token");
     logout();
     setUser(null);
     navigate("/");
@@ -121,7 +109,11 @@ const Header: React.FC = () => {
                     tabIndex={0}
                     onBlur={() => setIsMenuOpen(false)}
                     className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg"
-                    style={{ marginTop: "190px" }}
+                    style={{
+                      marginTop: "190px",
+                      marginRight: "-183px",
+                      width: "310px",
+                    }}
                   >
                     <ul>
                       <li>
@@ -187,6 +179,18 @@ const Header: React.FC = () => {
                   />
                 </svg>
               </button>
+            </div>
+            <div className="carts cursor-pointer relative">
+              <ul>
+                <li>
+                  <a href="/cart">
+                    <FontAwesomeIcon
+                      icon={faCartFlatbed}
+                      style={{ color: "#63E6BE", fontSize: "20px" }}
+                    />
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

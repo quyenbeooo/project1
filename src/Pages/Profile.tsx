@@ -6,7 +6,7 @@ import User from "../Type/Tuser";
 
 const Profile = () => {
   const { user, setUser } = useAuth();
-  const [selectedImage, setSelectedImage] = useState(null);
+  // const [selectedImage, setSelectedImage] = useState(null);
   console.log(user);
 
   const {

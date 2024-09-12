@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../ConText/AppContext";
 
@@ -15,12 +15,16 @@ const Login = () => {
     try {
       const userData = await login(username, password);
       console.log("Đăng nhập thành công, userData:", userData);
+      console.log(
+        "Username set in sessionStorage:",
+        sessionStorage.getItem("username")
+      );
 
       alert("Đăng nhập thành công");
       if (userData.role === "admin") {
-        navigate("/admin"); // Chuyển đến trang admin nếu là admin
+        navigate("/admin");
       } else {
-        navigate("/"); // Chuyển đến trang chủ nếu không phải admin
+        navigate("/");
       }
     } catch (error) {
       console.error("Đăng nhập thất bại:", error.message);

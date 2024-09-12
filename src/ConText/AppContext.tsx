@@ -39,7 +39,8 @@ export const AuthProvider = ({ children }) => {
         password,
       });
 
-      const userData = response.data;
+      const userData = response.data.users;
+      // const token = response.data;
 
       if (userData.isLocked) {
         throw new Error(
@@ -50,6 +51,7 @@ export const AuthProvider = ({ children }) => {
       // Lưu trữ dữ liệu người dùng bao gồm cả vai trò
       setUser(userData);
       cookies.set("user", userData, { path: "/" });
+      cookies.set("token", response.data.token, { path: "/" });
 
       return userData;
     } catch (error) {

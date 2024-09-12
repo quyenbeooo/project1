@@ -3,17 +3,20 @@ import instancs from "../apis";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { width } from "@fortawesome/free-solid-svg-icons/fa0";
-import Comment from "./Comment";
 import Tshoe from "../Type/Tshoe";
-type Props = {
-  listShoe: Tshoe[];
-};
+import Tcart from "../Type/Tcart";
+import { useDispatch } from "react-redux";
+import addToCartAsync from "../redux/slice/cartThunks";
+// type Props = {
+//   listShoe: Tshoe[];
+//   cart: Tcart[];
+// };
 const ShoeDetail = () => {
   const { id } = useParams<{ id: string }>();
-
+  const dispatch = useDispatch();
   const [shoe, setShoes] = useState<Tshoe | null>(null);
   const [loading, setLoading] = useState(true); // Thêm state loading
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
     const fetchShoes = async () => {
@@ -29,14 +32,41 @@ const ShoeDetail = () => {
     fetchShoes();
   }, [id]);
 
+  const handleAddToCart = () => {
+    if (!shoe) return; // Đảm bảo có sản phẩm trước khi thêm vào giỏ hàng
+    console.log(shoe);
+
+    const cartItem: Tcart = {
+      _id: shoe._id.toString(), // ID sản phẩm
+      product: {
+        _id: shoe._id.toString(),
+        name: shoe.name,
+        price: shoe.price,
+        image: shoe.image,
+        size: shoe.size,
+      },
+      qty: 1, // Số lượng mặc định là 1
+    };
+    console.log(cartItem);
+
+    dispatch(addToCartAsync(cartItem));
+    // Hiển thị thông báo
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 3000); // 3 giây
+  };
+
   if (loading) {
     return <div>Loading...</div>; // Hiển thị khi đang tải dữ liệu
   }
 
-  console.log(shoe);
-
   return (
     <>
+      {showNotification && (
+        <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+          Đã thêm vào giỏ hàng!
+        </div>
+      )}
+
       <section className="text-gray-700 body-font overflow-hidden bg-white">
         <div className="container px-5 py-24 mx-auto">
           <div
@@ -215,10 +245,11 @@ const ShoeDetail = () => {
                   <span className="mr-3">Size</span>
                   <div className="relative">
                     <select className="rounded border appearance-none border-gray-400 py-2 focus:outline-none focus:border-red-500 text-base pl-3 pr-10">
-                      <option>SM</option>
-                      <option>M</option>
-                      <option>L</option>
-                      <option>XL</option>
+                      {shoe?.size?.map((size, index) => (
+                        <option key={index} value={size}>
+                          {size}
+                        </option>
+                      ))}
                     </select>
                     <span className="absolute right-0 top-0 h-full w-10 text-center text-gray-600 pointer-events-none flex items-center justify-center">
                       <svg
@@ -236,13 +267,21 @@ const ShoeDetail = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex">
+              <div className="flex gap-[39px]">
                 <span className="title-font font-medium text-2xl text-gray-900">
                   ${shoe?.price}
                 </span>
-                <button className="flex ml-auto text-white bg-teal-600  border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded">
-                  Mua
-                </button>
+                <div className="flex gap-[20px]">
+                  <button className="flex ml-auto text-white bg-teal-600  border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded">
+                    Mua
+                  </button>
+                  <button
+                    onClick={handleAddToCart}
+                    className="flex ml-auto text-white bg-teal-600  border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded"
+                  >
+                    Thêm sản phẩm vào giỏ hàng
+                  </button>
+                </div>
                 <button className="rounded-full w-10 h-10 bg-gray-200 p-0 border-0 inline-flex items-center justify-center text-gray-500 ml-4">
                   <svg
                     fill="currentColor"

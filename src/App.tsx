@@ -28,6 +28,9 @@ import CategoryNike from "./Pages/CategoryClient/CategoryNike";
 import createCategory from "./apis/Category";
 import Tcategory from "./Type/Tcategory";
 import { toast } from "react-toastify";
+import Cart from "./Pages/Cart";
+import Tcart from "./Type/Tcart";
+import Cookies from "js-cookie";
 import "./App.css";
 const LoginLayout = ({ children }) => {
   return (
@@ -41,8 +44,11 @@ const LoginLayout = ({ children }) => {
 function App() {
   const navigate = useNavigate();
   const [shoes, setShoes] = useState<Tshoe[]>([]);
+  const [cart, setCart] = useState<Tcart[]>([]);
   const [category, setCategory] = useState<Tcategory[]>([]);
   const [user, setUser] = useState<[]>([]);
+
+  // lấy dữ liệu sản phẩm và show ra màn hình
   useEffect(() => {
     const fetchShoes = async () => {
       try {
@@ -54,6 +60,35 @@ function App() {
     };
     fetchShoes();
   }, []);
+
+  // lấy dữ liệu giỏ hàng và show ra màn hình
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const token = Cookies.get("token");
+        // console.log("Retrieved token:", token);
+        // if (!token) throw new Error("Token not found");
+
+        const response = await axios.get(
+          "http://localhost:3000/order/allcart",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const allCartItems = response.data.flatMap(
+          (cart: { cartItems: Tcart[] }) => cart.cartItems
+        );
+
+        setCart(allCartItems);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCartItems();
+  }, []);
+
   // Dữ liệu admin
   useEffect(() => {
     const fetchUser = async () => {
@@ -234,6 +269,17 @@ function App() {
             element={
               <LoginLayout>
                 <ProFile />
+              </LoginLayout>
+            }
+          />
+
+          <Route
+            path="/cart"
+            element={
+              <LoginLayout>
+                <Header />
+                <Cart listcart={cart} />
+                <Footer />
               </LoginLayout>
             }
           />

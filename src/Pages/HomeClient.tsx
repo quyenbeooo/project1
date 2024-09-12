@@ -1,8 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import Tshoe from "../Type/Tshoe";
 import Tcategory from "../Type/Tcategory";
-import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper-bundle.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";

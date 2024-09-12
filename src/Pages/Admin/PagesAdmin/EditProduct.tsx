@@ -31,6 +31,7 @@ const EditProduct = ({ onEdit, categories }: Props) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [product, setProducts] = useState<Tshoe | null>(null);
   const [file, setFile] = useState();
+  const [sizes, setSizes] = useState<string[]>([]);
 
   const toggleFormVisibility = () => {
     setIsFormVisible(!isFormVisible);
@@ -65,6 +66,7 @@ const EditProduct = ({ onEdit, categories }: Props) => {
   }, [id]);
 
   const onSubmit = async (data: Tshoe) => {
+    data.size = sizes;
     try {
       console.log("Submit data:", data); // Log dữ liệu được gửi đi
 
@@ -106,6 +108,21 @@ const EditProduct = ({ onEdit, categories }: Props) => {
   const handleFile = (e) => {
     setFile(e.target.files?.[0] || null);
   };
+
+  const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Lấy giá trị từ input
+    const input = e.target.value;
+
+    // Chia chuỗi thành mảng bằng dấu phẩy và loại bỏ khoảng trắng
+    const sizeArray = input
+      .split(",")
+      .map((size) => size.trim())
+      .filter((size) => size); // Loại bỏ các giá trị rỗng
+    console.log("Size Array:", sizeArray);
+    // Cập nhật state hoặc dữ liệu gửi đi
+    setSizes(sizeArray); // Giả sử bạn có state `sizes`
+  };
+
   return (
     <>
       <div className="p-6 flex justify-center items-center relative">
@@ -195,6 +212,7 @@ const EditProduct = ({ onEdit, categories }: Props) => {
                         className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm text-black"
                         placeholder="Enter Size"
                         {...register("size", { required: true })}
+                        onChange={handleSizeChange}
                       />
                     </div>
                   </div>
